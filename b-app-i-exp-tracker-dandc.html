@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Debit & Credit Tracker</title>
+  <link rel="stylesheet" href="bank-app-income-expense-tracker-style4biii.css" />
+</head>
+<body>
+  <div id="app-window">
+    <h1>🦅 Esotu Debit & Credit Tracker</h1>
+    <h2>Balance: ₦<span id="balance">0.00</span></h2>
+
+    <!-- Unified Debit/Credit Entry -->
+    <form id="debit-credit-form">
+      <input type="text" id="item-name" placeholder="Transaction name (e.g. Salary, Fuel)" required />
+      
+      <input type="number" id="price-per-unit" placeholder="Price per unit (₦)" required />
+      
+      <input type="number" id="item-weight" placeholder="Weight value" required />
+      <select id="weight-unit">
+        <option value="kg">kg</option>
+        <option value="g">g</option>
+        <option value="lb">lb</option>
+      </select>
+
+      <select id="trans-type">
+        <option value="debit">Debit</option>
+        <option value="credit">Credit</option>
+      </select>
+
+      <input type="number" id="amount" placeholder="Amount to record (₦)" required />
+      <button type="submit">Add Transaction</button>
+    </form>
+
+    <!-- Transaction History -->
+    <div id="output-area">
+      <h3>Transaction History</h3>
+      <ul id="history-list"></ul>
+    </div>
+  </div>
+
+  <script>
+    let balance = 0;
+    const balanceEl = document.getElementById("balance");
+    const historyList = document.getElementById("history-list");
+
+    document.getElementById("debit-credit-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("item-name").value.trim();
+      const pricePerUnit = parseFloat(document.getElementById("price-per-unit").value);
+      const weight = parseFloat(document.getElementById("item-weight").value);
+      const unit = document.getElementById("weight-unit").value;
+      const type = document.getElementById("trans-type").value;
+      const amount = parseFloat(document.getElementById("amount").value);
+
+      if (!name || isNaN(pricePerUnit) || isNaN(weight) || isNaN(amount)) return;
+
+      let adjustedWeight = weight;
+      if (unit === "g") adjustedWeight = weight / 1000;
+      if (unit === "lb") adjustedWeight = weight * 0.4536;
+
+      const calculatedPrice = pricePerUnit * weight;
+
+      const entry = document.createElement("li");
+      entry.textContent = `${name}: ₦${calculatedPrice.toFixed(2)} (${weight}${unit} @ ₦${pricePerUnit}/${unit}) → Logged ₦${amount.toFixed(2)} as ${type}`;
+
+      if (type === "debit") {
+        balance += amount;
+        entry.classList.add("income");
+      } else {
+        balance -= amount;
+        entry.classList.add("expense");
+      }
+
+      balanceEl.textContent = balance.toFixed(2);
+      historyList.appendChild(entry);
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>
